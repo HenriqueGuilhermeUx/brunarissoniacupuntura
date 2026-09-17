@@ -1,7 +1,10 @@
 const qs=new URLSearchParams(location.search);
-const attribution={utm_source:qs.get('utm_source')||'',utm_medium:qs.get('utm_medium')||'',utm_campaign:qs.get('utm_campaign')||'',utm_term:qs.get('utm_term')||'',utm_content:qs.get('utm_content')||'',gclid:qs.get('gclid')||''};
-try{if(Object.values(attribution).some(Boolean))localStorage.setItem('br_attribution',JSON.stringify(attribution));}catch{}
+const current={utm_source:qs.get('utm_source')||'',utm_medium:qs.get('utm_medium')||'',utm_campaign:qs.get('utm_campaign')||'',utm_term:qs.get('utm_term')||'',utm_content:qs.get('utm_content')||'',gclid:qs.get('gclid')||''};
+let attribution=current;
+try{if(Object.values(current).some(Boolean)){localStorage.setItem('br_attribution',JSON.stringify(current));}else{attribution=JSON.parse(localStorage.getItem('br_attribution')||'{}');}}catch{}
 function track(name,detail={}){try{window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:name,...detail,...attribution});}catch{}}
 document.querySelectorAll('[data-wa]').forEach(a=>a.addEventListener('click',()=>track('whatsapp_click',{placement:a.dataset.wa,href:a.href})));
 document.querySelectorAll('details').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)track('faq_open',{question:d.querySelector('summary')?.textContent||''})}));
+const form=document.getElementById('leadForm');
+if(form){Object.entries(attribution||{}).forEach(([k,v])=>{const input=form.elements.namedItem(k);if(input)input.value=v||''});form.addEventListener('submit',async e=>{e.preventDefault();const button=form.querySelector('button[type=submit]');const status=document.getElementById('formStatus');button.disabled=true;button.textContent='Enviando…';status.textContent='';try{const body=new URLSearchParams(new FormData(form));const r=await fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});if(!r.ok)throw new Error('submit');track('lead_form_submit',{placement:'site'});form.reset();status.textContent='Recebido. A Bruna poderá entrar em contato pelo WhatsApp informado.';button.textContent='Contato enviado ✓';}catch{status.textContent='Não conseguimos enviar agora. Você pode falar diretamente pelo WhatsApp.';button.disabled=false;button.textContent='Tentar novamente';}})}
 track('landing_view',{path:location.pathname});
