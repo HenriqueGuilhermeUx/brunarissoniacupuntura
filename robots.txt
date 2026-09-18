@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /office.html
+Disallow: /office
+Sitemap: https://brunarissoniacupuntura.netlify.app/sitemap.xml
