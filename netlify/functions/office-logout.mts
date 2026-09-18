@@ -1,0 +1,1 @@
+export default async()=>new Response(null,{status:204,headers:{"Set-Cookie":"bruna_office_session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0"}});
