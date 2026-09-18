@@ -8,7 +8,8 @@ export default async (req: Request) => {
   const whatsapp = String(data.get("whatsapp") || "").trim().slice(0,40);
   const consent = String(data.get("consentimento_contato") || "");
   if (!nome || !whatsapp || consent !== "sim") return new Response("Dados inválidos", { status: 400 });
-  const id = crypto.randomUUID();
+  const requestedId=String(data.get("lead_id")||"").trim();
+  const id=/^[a-f0-9-]{20,50}$/i.test(requestedId)?requestedId:crypto.randomUUID();
   const lead = {
     id, nome, whatsapp, stage: "lead", createdAt: new Date().toISOString(),
     attribution: {
