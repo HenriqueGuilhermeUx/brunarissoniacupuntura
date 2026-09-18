@@ -1,0 +1,3 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
+function valid(req:Request){const secret=Netlify.env.get("BRUNA_OFFICE_SESSION_SECRET");if(!secret)return false;const raw=(req.headers.get("cookie")||"").split(";").map(x=>x.trim()).find(x=>x.startsWith("bruna_office_session="))?.split("=")[1]||"";const [e,s]=raw.split(".");if(!e||!s||Number(e)<Date.now())return false;const x=createHmac("sha256",secret).update(e).digest("hex");const a=Buffer.from(s),b=Buffer.from(x);return a.length===b.length&&timingSafeEqual(a,b)}
+export default async(req:Request)=>Response.json({authenticated:valid(req)},{status:valid(req)?200:401});
